@@ -42,6 +42,12 @@
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js').catch(() => {});
   }
+  // Listen for reload requests from the SAGE iframe
+  window.addEventListener('message', function(e) {
+    if (e.data && e.data.type === 'sage-reload') {
+      window.location.reload();
+    }
+  });
 </script>
 </head>
 <body>
