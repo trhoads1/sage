@@ -4,14 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>SAGE</title>
-<!-- PWA: fullscreen on iOS -->
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="SAGE">
-<!-- PWA: fullscreen on Android -->
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="theme-color" content="#0f1114">
-<!-- Manifest & Icons -->
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -27,7 +24,6 @@
     border: none;
     background: #0f1114;
   }
-  /* Safe area for notch/dynamic island */
   @supports (padding-top: env(safe-area-inset-top)) {
     body {
       padding-top: env(safe-area-inset-top);
@@ -39,10 +35,21 @@
   }
 </style>
 <script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js').catch(() => {});
+  var SAGE_URL = "https://script.google.com/a/macros/bemobile.com/s/AKfycbwhjjv03OoCGwrnzBKY-5bxUyOMQf8y0WtOD4Fupepkw-KsheeQVsCTG2ort7C9k-X1tg/exec";
+
+  // iOS standalone mode: cross-origin iframes are blocked by WebKit.
+  // Redirect directly to the Apps Script URL instead.
+  var isStandalone = window.navigator.standalone || window.matchMedia("(display-mode: standalone)").matches;
+  var isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+
+  if (isStandalone && isIOS) {
+    window.location.replace(SAGE_URL);
   }
-  // Listen for reload requests from the SAGE iframe
+
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js').catch(function() {});
+  }
+
   window.addEventListener('message', function(e) {
     if (e.data && e.data.type === 'sage-reload') {
       window.location.reload();
